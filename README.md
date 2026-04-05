@@ -146,7 +146,7 @@ The contract's `__check_auth` expects the signature field to be a `Vec<Val>` wit
 - [x] Phase 2 — Full WebAuthn pipeline (DER→raw, real pubkey extraction, challenge binding)
 - [x] Phase 3 — Factory contract + deterministic wallet deployment
 - [x] Phase 4 — RP ID / origin verification, testnet integration (smoke test)
-- [ ] Phase 5 — Guardian recovery, multi-signer *(in progress — nonce/replay protection remaining)*
+- [x] Phase 5 — Guardian recovery, multi-signer, on-chain nonce/replay protection
 - [x] Wallet app — Full reference wallet: dashboard, send, swap, contacts, lock screen, PWA, onboarding tutorial
 
 ## License

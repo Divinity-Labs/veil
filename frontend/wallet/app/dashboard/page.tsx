@@ -210,8 +210,9 @@ export default function DashboardPage() {
           })),
         ]
 
-        // Merge Wraith records with Horizon records, deduplicate by hash, sort newest first
-        const merged = [...wraithRecords, ...txRecords]
+        // Merge: Horizon records first so swap/payment types are preserved over
+        // generic Wraith "sent"/"received" records that share the same hash.
+        const merged = [...txRecords, ...wraithRecords]
           .filter((tx, i, arr) => arr.findIndex(t => t.hash === tx.hash) === i)
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, 30)
