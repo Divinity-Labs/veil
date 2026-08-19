@@ -814,9 +814,16 @@ function DashboardPageContent() {
               </div>
             </div>
           ) : assets.length === 0 ? (
-            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-              <p style={{ fontSize: '0.875rem', color: 'rgba(246,247,248,0.4)' }}>
-                No assets found. Fund this address on Stellar Testnet to get started.
+            <div className="card" style={{ 
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '3rem 2rem', border: '1px dashed rgba(246,247,248,0.1)', background: 'transparent'
+            }}>
+              <div style={{ padding: '1rem', background: 'rgba(246,247,248,0.02)', borderRadius: '50%', marginBottom: '1rem' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(246,247,248,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              </div>
+              <p style={{ fontSize: '0.9375rem', fontWeight: 500, color: 'var(--off-white)', marginBottom: '0.375rem' }}>Your wallet is empty</p>
+              <p style={{ fontSize: '0.8125rem', color: 'rgba(246,247,248,0.4)', textAlign: 'center', maxWidth: '250px' }}>
+                Fund this address on the Stellar Testnet to get started with veil.
               </p>
             </div>
           ) : (
@@ -932,9 +939,18 @@ function DashboardPageContent() {
               tx.type !== 'swapped'
             )
             if (!loading && filtered.length === 0) return (
-              <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
-                <p style={{ fontSize: '0.875rem', color: 'rgba(246,247,248,0.4)' }}>
-                  {transactions.length === 0 ? 'No transactions yet.' : `No ${txFilter} found.`}
+              <div className="card" style={{ 
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                padding: '3rem 2rem', border: '1px dashed rgba(246,247,248,0.1)', background: 'transparent'
+              }}>
+                <div style={{ padding: '1rem', background: 'rgba(246,247,248,0.02)', borderRadius: '50%', marginBottom: '1rem' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(246,247,248,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <p style={{ fontSize: '0.9375rem', fontWeight: 500, color: 'var(--off-white)', marginBottom: '0.375rem' }}>
+                  {transactions.length === 0 ? 'No transactions yet' : `No ${txFilter} found`}
+                </p>
+                <p style={{ fontSize: '0.8125rem', color: 'rgba(246,247,248,0.4)', textAlign: 'center' }}>
+                  {transactions.length === 0 ? "Activity will appear here once you send or receive assets." : "Try changing your filter to see more activity."}
                 </p>
               </div>
             )
