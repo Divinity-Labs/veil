@@ -54,6 +54,9 @@ export interface Sep30Signature {
     network_passphrase: string;
 }
 
+/**
+ * How to reach a SEP-30 recovery server and authenticate to it.
+ */
 export interface Sep30ClientOptions {
     /** Base URL of the recovery server, e.g. "https://recovery.example.com". */
     baseUrl: string;
@@ -75,6 +78,15 @@ export class Sep30Error extends Error {
 
 // ── Client ──────────────────────────────────────────────────────────────────
 
+/**
+ * Client for a SEP-30 recoverable-account server.
+ *
+ * Wraps the account registration, listing and signing endpoints, resolving the
+ * SEP-10 token before each request when {@link Sep30ClientOptions.getAuthToken}
+ * is supplied.
+ *
+ * @throws {Sep30Error} from every request method, on a non-2xx response.
+ */
 export class Sep30Client {
     private readonly baseUrl: string;
     private readonly opts: Sep30ClientOptions;

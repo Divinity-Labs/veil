@@ -87,6 +87,10 @@ export interface AttestationInfo {
  */
 export type AttestationPolicy = (info: AttestationInfo) => boolean | void | Promise<boolean | void>;
 
+/**
+ * Inputs to {@link verifyAttestation}: the raw registration response, plus how
+ * strictly to treat it.
+ */
 export interface VerifyAttestationOptions {
     /** Raw `AuthenticatorAttestationResponse.attestationObject` bytes. */
     attestationObject: Uint8Array | ArrayBuffer;

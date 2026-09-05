@@ -8,41 +8,83 @@ import {
     Horizon,
 } from '@stellar/stellar-sdk';
 
+/**
+ * Network settings shared by every escrow call in this module.
+ *
+ * These operations are classic Stellar, not Soroban, so they go through Horizon
+ * rather than the RPC endpoint the rest of the SDK uses.
+ */
 export type EscrowConfig = {
     /** Stellar Horizon REST API base URL (e.g. "https://horizon-testnet.stellar.org").
      *  Must be a Horizon URL — NOT a Soroban RPC endpoint. */
     horizonUrl: string;
+    /** Stellar network passphrase. Use Networks.TESTNET or Networks.PUBLIC. */
     networkPassphrase: string;
 };
 
+/**
+ * Arguments for {@link createEscrow}.
+ */
 export type CreateEscrowOptions = {
+    /** Funds the escrow and signs the transaction. Also the reclaim party. */
     senderKeypair: Keypair;
+    /** Account allowed to claim, an Ed25519 public key ("G..."). */
     recipientAddress: string;
+    /** Amount to lock up, as a decimal string. */
     amount: string;
+    /** Asset to lock up. */
     asset: Asset;
     /** Duration in seconds from now before the sender can reclaim the balance. */
     claimDeadlineSeconds: number;
+    /** Horizon endpoint and network to build against. */
     config: EscrowConfig;
 };
 
+/**
+ * What {@link createEscrow} produced.
+ */
 export type EscrowResult = {
+    /** Stellar claimable balance id, needed to claim or reclaim. */
     balanceId: string;
+    /** Shareable claim URL from {@link buildClaimLink}. */
     claimLink: string;
+    /** When the sender may reclaim, as a Unix timestamp in seconds. */
     expiresAt: number;
 };
 
+/**
+ * Arguments for {@link claimEscrow}.
+ */
 export type ClaimOptions = {
+    /** The recipient named when the escrow was created. Signs the claim. */
     claimantKeypair: Keypair;
+    /** The balance to claim, from {@link EscrowResult.balanceId}. */
     balanceId: string;
+    /** Horizon endpoint and network to build against. */
     config: EscrowConfig;
 };
 
+/**
+ * Arguments for {@link reclaimEscrow}.
+ */
 export type ReclaimOptions = {
+    /** The account that created the escrow. Signs the reclaim. */
     senderKeypair: Keypair;
+    /** The balance to reclaim, from {@link EscrowResult.balanceId}. */
     balanceId: string;
+    /** Horizon endpoint and network to build against. */
     config: EscrowConfig;
 };
 
+/**
+ * Build the shareable claim URL for an escrow balance.
+ *
+ * The host is fixed to the hosted Veil wallet and is not configurable, so a
+ * self-hosted deployment should construct its own link from the balance id.
+ *
+ * @param balanceId The claimable balance id.
+ * @returns An absolute claim URL.
+ */
 export function buildClaimLink(balanceId: string): string {
     return `https://app.veil.xyz/claim/${balanceId}`;
 }

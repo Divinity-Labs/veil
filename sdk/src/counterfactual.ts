@@ -1,5 +1,10 @@
 import { computeWalletAddress } from './utils';
 
+/**
+ * The factory and network an address is derived against. Both must match the
+ * deployment the wallet will actually land on, or the derived address will not
+ * be the one that gets deployed.
+ */
 export type CounterfactualConfig = {
     /** The factory contract's Stellar strkey (e.g. "CABC..."). */
     factoryAddress: string;
@@ -7,6 +12,10 @@ export type CounterfactualConfig = {
     networkPassphrase: string;
 };
 
+/**
+ * A wallet address derived from a public key before the contract exists
+ * on-chain, plus the inputs needed to verify it independently.
+ */
 export type CounterfactualAddress = {
     /** Deterministic Soroban contract address (C... 56 chars). */
     address: string;

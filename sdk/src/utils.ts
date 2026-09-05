@@ -2,6 +2,12 @@ import { StrKey, xdr, hash as stellarHash } from '@stellar/stellar-sdk';
 
 // ── Buffer helpers ────────────────────────────────────────────────────────────
 
+/**
+ * Hex-encode bytes, two lowercase digits per byte.
+ *
+ * @param input The bytes to encode.
+ * @returns The hex string, empty for empty input.
+ */
 export function bufferToHex(input: Uint8Array | ArrayBuffer): string {
     const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
     return Array.from(bytes)
@@ -9,6 +15,14 @@ export function bufferToHex(input: Uint8Array | ArrayBuffer): string {
         .join('');
 }
 
+/**
+ * Decode a hex string back to bytes. Inverse of {@link bufferToHex}.
+ *
+ * @param hex Hex digits, without a `0x` prefix and of even length.
+ * @returns The decoded bytes.
+ * @throws If the string has an odd number of characters. Non-hex characters are
+ * not rejected; they decode to `NaN` bytes.
+ */
 export function hexToUint8Array(hex: string): Uint8Array {
     if (hex.length % 2 !== 0) throw new Error('Invalid hex string');
     const array = new Uint8Array(hex.length / 2);

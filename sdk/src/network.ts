@@ -1,15 +1,29 @@
 import { Asset, Networks } from '@stellar/stellar-sdk';
 import type { StorageAdapter } from './core';
 
+/** The Stellar networks Veil deploys to. */
 export type VeilNetworkName = 'testnet' | 'mainnet';
 
+/**
+ * Everything needed to talk to one Stellar network.
+ *
+ * The factory is deployed separately per network, so the same passkey resolves
+ * to a different wallet contract on each.
+ */
 export type VeilNetwork = {
+  /** Machine name, and the key this entry sits under in {@link NETWORKS}. */
   name: VeilNetworkName;
+  /** Human-readable name for UI. */
   displayName: string;
+  /** Stellar network passphrase. */
   networkPassphrase: string;
+  /** Horizon REST base URL, for classic operations. */
   horizonUrl: string;
+  /** Soroban RPC base URL, for contract calls. Empty when none is configured. */
   rpcUrl: string;
+  /** The wallet factory contract on this network ("C..."). */
   factoryContractId: string;
+  /** Friendbot funding endpoint, or `null` on networks without one. */
   friendbotUrl: string | null;
 };
 
@@ -33,11 +47,18 @@ export const WALLET_KEYS = [
   'veil_signer_public_key',
 ] as const;
 
+/** {@link WALLET_KEYS} as a set, for membership checks in {@link namespaceKey}. */
 export const WALLET_KEY_SET = new Set<string>(WALLET_KEYS);
 
 /** The suffix mainnet slots carry. Testnet uses the bare key for backward compatibility. */
 export const MAINNET_KEY_SUFFIX = '_mainnet';
 
+/**
+ * Built-in endpoints and factory addresses for each supported network.
+ *
+ * Prefer {@link getNetworkConfig}, which falls back to testnet for an unknown
+ * name.
+ */
 export const NETWORKS: Record<VeilNetworkName, VeilNetwork> = {
   testnet: {
     name: 'testnet',
