@@ -390,6 +390,7 @@ export default function AgentPage() {
         <header className="wallet-nav">
           <button
             onClick={() => router.back()}
+            aria-label="Back"
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--warm-grey)', display: 'flex' }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -579,6 +580,7 @@ export default function AgentPage() {
         <button
           onClick={clearHistory}
           className="agent-header__action"
+          aria-label="Clear history"
           title="Clear history"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">

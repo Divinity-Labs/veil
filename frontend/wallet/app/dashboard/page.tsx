@@ -655,6 +655,7 @@ function DashboardPageContent() {
             }}
             className='settings-button'
             style={{ color: "var(--color-muted)"}}
+            aria-label="Copy wallet address"
             title="Copy wallet address"
           >
             <span className="address-chip">
@@ -791,6 +792,7 @@ function DashboardPageContent() {
                 id="dashboard-prf-downgrade-dismiss"
                 onClick={() => setPrfDowngradeDismissed(true)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', fontSize: '1rem', lineHeight: 1, padding: '0 0 0 0.5rem' }}
+                aria-label="Dismiss fee-payer warning"
                 title="Dismiss"
               >
                 ×
@@ -826,6 +828,7 @@ function DashboardPageContent() {
               <button
                 onClick={() => setSweepDismissed(true)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted)', fontSize: '1rem', lineHeight: 1, padding: '0 0 0 0.5rem' }}
+                aria-label="Dismiss stranded balance notice"
                 title="Dismiss"
               >
                 ×

@@ -87,6 +87,7 @@ export default function ProfileSettingsPage() {
       <header className="wallet-nav">
         <button
           onClick={() => router.back()}
+          aria-label="Back to settings"
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem', color: 'var(--warm-grey)', display: 'flex' }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">

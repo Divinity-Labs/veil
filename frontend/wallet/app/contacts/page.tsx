@@ -139,6 +139,7 @@ export default function ContactsPage() {
                 <button
                   onClick={() => removeContact(contact.id)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(246,247,248,0.3)', padding: '0.5rem' }}
+                  aria-label="Delete contact"
                   title="Delete contact"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
