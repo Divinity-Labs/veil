@@ -284,6 +284,25 @@ Current budgets (brotli-compressed, includes all transitive deps):
 
 If you legitimately need more headroom, raise the relevant `limit` in the `size-limit` block of `sdk/package.json` in the same PR that introduces the growth, and call out the increase in the PR description so reviewers can sanity-check the cause.
 
+### Run the wallet
+
+```bash
+cd frontend/wallet
+npm install
+npm run dev            # http://localhost:3000
+```
+
+No environment configuration is needed for a testnet run: every variable has a
+working default or gates a feature that degrades cleanly when unset. Copy
+`frontend/wallet/.env.example` to `.env.local` when you want to override one.
+
+Both files document all 28 variables the wallet reads, grouped and marked with
+what each is required for — see the table in
+[`frontend/wallet/README.md`](frontend/wallet/README.md#environment-variables).
+
+> WebAuthn needs a secure context, so passkey flows work on `localhost` and
+> `https://` only.
+
 ### React Native / Expo
 
 The SDK ships a platform-split WebAuthn layer.  Metro automatically resolves

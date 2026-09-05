@@ -169,19 +169,85 @@ If the browser cache is cleared (wiping `localStorage`):
 
 ## Environment variables
 
-Set these in Vercel (or `.env.local` for local dev):
+Set these in Vercel (or `.env.local` for local dev). `.env.example` carries the
+same list with longer notes.
 
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_NETWORK` | `testnet` or `mainnet` |
-| `NEXT_PUBLIC_FACTORY_CONTRACT_ID_TESTNET` | Testnet factory contract address |
-| `NEXT_PUBLIC_FACTORY_CONTRACT_ID_MAINNET` | Mainnet factory contract address |
-| `NEXT_PUBLIC_FACTORY_CONTRACT_ID` | Legacy fallback for testnet-only setups |
-| `NEXT_PUBLIC_HORIZON_URL` | Optional testnet Horizon override |
-| `NEXT_PUBLIC_SOROBAN_RPC_URL` | Optional testnet Soroban RPC override |
-| `NEXT_PUBLIC_MAINNET_RPC_URL` | Mainnet Soroban RPC provider URL |
-| `NEXT_PUBLIC_WRAITH_URL` | Wraith indexer URL (transfer history) |
-| `NEXT_PUBLIC_AGENT_WS_URL` | Veil Agent WebSocket URL |
+**None of them are required to run on testnet.** Every variable either has a
+working default compiled into `lib/`, or gates a feature that degrades cleanly
+when unset, so `npm run dev` works on a fresh clone with nothing configured.
+The "Required for" column says what you lose by leaving one blank.
+
+Anything without the `NEXT_PUBLIC_` prefix is server-only and never reaches the
+browser.
+
+### Network
+
+| Variable | Required for | Description |
+|---|---|---|
+| `NEXT_PUBLIC_NETWORK` | — | `testnet` or `mainnet`. First visit only; the user's switcher choice is stored in localStorage and wins after that |
+| `NEXT_PUBLIC_FACTORY_CONTRACT_ID_TESTNET` | — | Testnet factory contract address. Has a working default |
+| `NEXT_PUBLIC_FACTORY_CONTRACT_ID_MAINNET` | — | Mainnet factory contract address. Has a working default |
+| `NEXT_PUBLIC_FACTORY_CONTRACT_ID` | — | Legacy fallback for testnet-only setups; the per-network pair above wins |
+| `NEXT_PUBLIC_HORIZON_URL` | — | Testnet Horizon override |
+| `NEXT_PUBLIC_SOROBAN_RPC_URL` | — | Testnet Soroban RPC override |
+| `NEXT_PUBLIC_RPC_URL` | — | Older alias for the above, read only when it is unset |
+
+### Mainnet RPC
+
+Stellar publishes no public Soroban RPC for mainnet, so mainnet needs an
+endpoint of your own. With none of these set, the UI keeps mainnet disabled.
+
+| Variable | Required for | Description |
+|---|---|---|
+| `MAINNET_RPC_URL` | mainnet | Server-side, preferred. Proxied via `/api/rpc/mainnet` so the provider key never reaches the browser |
+| `SOROBAN_MAINNET_RPC_URL` | — | Server-side fallback, read only when `MAINNET_RPC_URL` is unset |
+| `NEXT_PUBLIC_MAINNET_RPC_URL` | mainnet | Browser-exposed and takes precedence over the proxy. Local development only — never a metered or keyed URL |
+
+### WebAuthn relying party
+
+Both unset on web: the SDK falls back to `window.location`. Native (Expo /
+React Native) builds have no `window` and must set them.
+
+| Variable | Required for | Description |
+|---|---|---|
+| `NEXT_PUBLIC_RP_ID` | native builds | Relying party ID, e.g. `veil.app` |
+| `NEXT_PUBLIC_ORIGIN` | native builds | Origin, e.g. `https://veil.app` |
+
+### Contract WASM hashes
+
+| Variable | Required for | Description |
+|---|---|---|
+| `NEXT_PUBLIC_VAULT_WASM_HASH` | creating a vault | Vault bytecode hash. Attaching and managing an existing vault works without it |
+| `NEXT_PUBLIC_VAULT_WASM_HASH_TESTNET` | creating a vault | Per-network vault hash |
+| `NEXT_PUBLIC_VAULT_WASM_HASH_MAINNET` | creating a vault | Per-network vault hash |
+| `NEXT_PUBLIC_MULTISIG_WASM_HASH_TESTNET` | — | Has a verified default. A network with no hash has no `/multisig` route |
+| `NEXT_PUBLIC_MULTISIG_WASM_HASH_MAINNET` | `/multisig` on mainnet | No default; the contract is not installed on mainnet. Set only after installing it (#672) |
+
+### Services
+
+| Variable | Required for | Description |
+|---|---|---|
+| `NEXT_PUBLIC_WC_PROJECT_ID` | dApp connections | WalletConnect Cloud project ID |
+| `NEXT_PUBLIC_AGENT_WS_URL` | `/agent` | Veil Agent WebSocket URL |
+| `NEXT_PUBLIC_BLEND_POOL_IDS` | `/earn`, `/pools` | Comma-separated Blend pool contract IDs. No pools listed when empty |
+| `NEXT_PUBLIC_WRAITH_URL` | — | Wraith indexer URL for activity history and the NFT gallery |
+| `NEXT_PUBLIC_LENS_URL` | — | Lens price-oracle URL for fiat conversion. Defaults to the hosted deployment |
+| `NEXT_PUBLIC_SOROSWAP_API_KEY` | — | Swap routing key. Falls back to SDEX paths, which quote worse but work |
+| `NEXT_PUBLIC_SEP24_ANCHORS` | — | Comma-separated SEP-24 anchor domains. Defaults to `testanchor.stellar.org` |
+| `NEXT_PUBLIC_TRANSAK_API_KEY` | — | Fiat onramp key. The widget opens in limited mode without one |
+
+### Server-only secrets
+
+| Variable | Required for | Description |
+|---|---|---|
+| `SPONSOR_SECRET_KEY` | sponsored trustlines | **Secret.** Stellar secret key (`S…`) of the account paying the reserve for a user's first trustline. Spendable — must never gain a `NEXT_PUBLIC_` prefix. Without it `/api/sponsor-trustline` returns 503 and the wallet asks the user to fund their own account |
+
+### Diagnostics
+
+| Variable | Required for | Description |
+|---|---|---|
+| `NEXT_PUBLIC_SENTRY_DSN` | — | Error reporting. Off when unset |
+| `NEXT_PUBLIC_NFT_FIXTURES` | — | `1` shows the gallery's invented demo NFTs. Never enable where real users can reach it |
 
 ---
 
