@@ -1,3 +1,4 @@
+import { errorMessage } from '../lib/errorMessage';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -29,7 +30,7 @@ export default function AssetsScreen() {
       const assets = await fetchHeldAssets(address);
       setState({ kind: 'ready', assets });
     } catch (err) {
-      setState({ kind: 'error', message: err instanceof Error ? err.message : String(err) });
+      setState({ kind: 'error', message: errorMessage(err) });
     }
   }, []);
 
@@ -38,7 +39,7 @@ export default function AssetsScreen() {
   }, [load]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Assets</Text>
         <ThemeToggle />

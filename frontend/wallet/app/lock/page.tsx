@@ -1,5 +1,6 @@
 'use client'
 
+import { NetworkSwitcher } from '@/components/NetworkSwitcher'
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { LockKeyhole, Fingerprint, AlertCircle } from 'lucide-react'
@@ -7,6 +8,8 @@ import { useInvisibleWallet } from '@veil/sdk'
 import { ensureFeePayer } from '@/lib/feePayer'
 import { FEE_PAYER_PRF_SALT, type PrfEvaluator } from '@veil/prf'
 import { walletConfig } from '@/lib/network'
+import { walletLocal, walletSession } from '@/lib/walletStorage'
+import { passkeyErrorMessage } from '@/lib/passkeyAuth'
 
 // ── Lock screen ───────────────────────────────────────────────────────────────
 export default function LockPage() {
@@ -26,7 +29,7 @@ export default function LockPage() {
       // wallet.login() only checks localStorage + chain; it doesn't prompt the
       // device. We call navigator.credentials.get() with userVerification:
       // 'required' so the OS always shows Face ID / fingerprint / Windows Hello.
-      const keyId = localStorage.getItem('invisible_wallet_key_id')
+      const keyId = walletLocal.getItem('invisible_wallet_key_id')
       if (!keyId) {
         setError('No passkey found. Please register again.')
         return
@@ -78,13 +81,13 @@ export default function LockPage() {
         return
       }
 
-      const existing = sessionStorage.getItem('invisible_wallet_address')
+      const existing = walletSession.getItem('invisible_wallet_address')
       if (existing && existing !== result.walletAddress) {
         sessionStorage.clear()
         setError('Account mismatch detected. Please register again.')
         return
       }
-      sessionStorage.setItem('invisible_wallet_address', result.walletAddress)
+      walletSession.setItem('invisible_wallet_address', result.walletAddress)
 
       // Re-establish the fee-payer for this session. PRF wallets re-derive the
       // seed from the assertion above (no extra prompt) and keep it in
@@ -97,8 +100,7 @@ export default function LockPage() {
       router.replace('/dashboard')
 
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unlock failed. Please try again.'
-      setError(message)
+      setError(passkeyErrorMessage(err))
     } finally {
       setIsUnlocking(false)
     }
@@ -110,6 +112,10 @@ export default function LockPage() {
       style={{ justifyContent: 'center', alignItems: 'center', padding: '2rem 1.25rem' }}
     >
       <div style={{ maxWidth: 400, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2.5rem' }}>
+        <div style={{ width: '100%', maxWidth: 260, margin: '0 auto 1.75rem' }}>
+          <NetworkSwitcher />
+        </div>
+
         <header style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'center' }}>
            {/* Veil wordmark — Anton ALL CAPS per Stellar brand manual */}
         <span style={{ fontFamily: 'Anton, Impact, sans-serif', fontSize: '2rem', letterSpacing: '0.08em', color: 'var(--gold)', userSelect: 'none' }}>

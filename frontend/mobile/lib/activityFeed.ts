@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { AppState, type NativeEventSubscription } from 'react-native';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,6 +24,7 @@ type ActivityListener = (records: TxRecord[]) => void;
 let _records: TxRecord[] = [];
 let _listeners = new Set<ActivityListener>();
 let _pollInterval: ReturnType<typeof setInterval> | null = null;
+let _appStateSub: NativeEventSubscription | null = null;
 let _currentAddress: string | null = null;
 let _wraithUrl: string | null = null;
 
@@ -137,20 +139,61 @@ async function fetchTransfers(
 /**
  * Replace the store with a batch of pre-fetched records (e.g. initial load).
  * Notifies all subscribers.
+ *
+ * Pass `{ merge: true }` for a refresh. The feed is rebuilt from sources that
+ * can each degrade independently — a rate-limited RPC event scan, a Horizon
+ * page that times out — so a refresh that returns fewer rows usually means one
+ * source blinked, not that history vanished. Replacing wholesale made the feed
+ * visibly empty and refill every few polls; merging keeps the union, newest
+ * first, with the incoming (fresher) version of a row winning on id collision.
+ *
+ * Wiping still has to be possible, so the default stays replace: switching
+ * wallets must not leave the previous wallet's rows on screen.
  */
-export function hydrateActivityFeed(records: TxRecord[]): void {
-  _records = records;
+export function hydrateActivityFeed(records: TxRecord[], options?: { merge?: boolean }): void {
+  if (!options?.merge) {
+    _records = records;
+    notify();
+    return;
+  }
+
+  const byMovement = new Map<string, TxRecord>();
+  for (const r of _records) byMovement.set(movementKey(r), r);
+  // Incoming wins on collision: it is the fresher read of the same movement,
+  // and may carry a richer version of it (a swap rather than a bare transfer).
+  for (const r of records) byMovement.set(movementKey(r), r);
+  _records = [...byMovement.values()].sort((a, b) => b.timestamp - a.timestamp);
   notify();
 }
 
 /**
- * Append new records, deduplicating by tx hash and sorting newest-first.
+ * Identity of a *movement of funds*, as distinct from identity of a row.
+ *
+ * A payment can reach this feed through two sources with two different ids:
+ * the contract's SAC transfer event and the fee-payer's classic Horizon
+ * payment. `loadHorizonActivity` reconciles them by hash within a single
+ * fetch, but across polls the winning source can change — the classic leg is
+ * indexed a moment later than the event — so the same payment arrives first as
+ * `ev.id` and then as the Horizon operation id. Keyed by id, both survive and
+ * the user sees their transfer twice.
+ *
+ * The hash alone is too coarse to key on: a bulk payout is one transaction
+ * carrying many payments, and collapsing by hash would show one row instead of
+ * five. Counterparty, amount and asset separate those, and are identical
+ * across the two sources describing one movement.
+ */
+export function movementKey(r: TxRecord): string {
+  if (!r.hash) return r.id;
+  return `${r.hash}|${r.type}|${r.counterparty}|${r.amount}|${r.asset}`;
+}
+
+/**
+ * Append new records, deduplicating by movement and sorting newest-first.
  * Notifies all subscribers.
  */
 export function appendActivityFeed(newRecords: TxRecord[]): void {
-  const deduped = newRecords.filter(
-    (r) => !_records.some((existing) => existing.hash === r.hash && existing.hash !== undefined),
-  );
+  const present = new Set(_records.map(movementKey));
+  const deduped = newRecords.filter((r) => !present.has(movementKey(r)));
   if (deduped.length === 0) return;
   _records = [..._records, ...deduped].sort((a, b) => b.timestamp - a.timestamp);
   notify();
@@ -188,19 +231,44 @@ export function startPolling(address: string, wraithUrl: string | null): void {
 
   if (!wraithUrl) return;
 
-  // Poll on an interval
-  _pollInterval = setInterval(async () => {
+  const tick = async () => {
     const fresh = await fetchTransfers(wraithUrl, address);
     if (fresh.length > 0) {
       appendActivityFeed(fresh);
     }
-  }, POLL_MS);
+  };
+
+  const start = () => {
+    if (_pollInterval === null) _pollInterval = setInterval(() => void tick(), POLL_MS);
+  };
+  const stop = () => {
+    if (_pollInterval !== null) {
+      clearInterval(_pollInterval);
+      _pollInterval = null;
+    }
+  };
+
+  if (AppState.currentState === 'active') start();
+
+  // Backgrounded, this stops. Nothing reads the feed behind a locked screen,
+  // and every tick is an indexer request; a phone left in a pocket would
+  // otherwise spend the hour making them.
+  _appStateSub = AppState.addEventListener('change', (state) => {
+    if (state === 'active') {
+      void tick();
+      start();
+    } else {
+      stop();
+    }
+  });
 }
 
 /**
  * Stop the polling loop and clear the current address.
  */
 export function stopPolling(): void {
+  _appStateSub?.remove();
+  _appStateSub = null;
   if (_pollInterval !== null) {
     clearInterval(_pollInterval);
     _pollInterval = null;
