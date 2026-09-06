@@ -655,7 +655,7 @@ function DashboardPageContent() {
             }}
             className='settings-button'
             style={{ color: "var(--color-muted)"}}
-            aria-label="Copy wallet address"
+            aria-label={`Copy wallet address ${walletAddress.slice(0, 6)}…${walletAddress.slice(-6)}`}
             title="Copy wallet address"
           >
             <span className="address-chip">

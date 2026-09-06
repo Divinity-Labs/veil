@@ -81,7 +81,7 @@ export default function AgentSettingsPage() {
               type="button"
               role="switch"
               aria-checked={agentEnabled}
-              aria-label="Enable AI agent"
+              aria-label="Veil Agent"
               style={{
                 position: 'relative', width: '44px', height: '24px', borderRadius: '100px',
                 background: agentEnabled ? 'var(--gold)' : 'var(--surface-md)',
