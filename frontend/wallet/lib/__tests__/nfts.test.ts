@@ -49,9 +49,63 @@ describe('nfts', () => {
       expect(truncateAddress(NFT_C, 6, 6)).toBe('CAAAAA…AAANFT')
     })
 
+    it('elides the middle of a G-address', () => {
+      expect(WALLET).toHaveLength(56)
+      expect(truncateAddress(WALLET, 6, 6)).toBe('GAAAAA…AAAWLT')
+    })
+
+    it('keeps both ends so the address stays checkable', () => {
+      const out = truncateAddress(WALLET)
+
+      // Both ends are what a user compares against a pasted address, so the
+      // prefix and suffix must survive verbatim.
+      expect(out.startsWith(WALLET.slice(0, 6))).toBe(true)
+      expect(out.endsWith(WALLET.slice(-6))).toBe(true)
+      expect(out).toContain('…')
+    })
+
+    it('does not confuse two addresses that share a prefix', () => {
+      // G-addresses share a leading character, so a head-only truncation would
+      // render distinct wallets identically.
+      const a = `G${'A'.repeat(49)}FIRST`
+      const b = `G${'A'.repeat(49)}OTHER`
+
+      expect(truncateAddress(a)).not.toBe(truncateAddress(b))
+    })
+
+    it('defaults to six characters at each end', () => {
+      expect(truncateAddress(WALLET)).toBe(truncateAddress(WALLET, 6, 6))
+    })
+
+    it('honours custom head and tail lengths', () => {
+      // The NFT list renders contract ids at 5/5.
+      expect(truncateAddress(NFT_C, 5, 5)).toBe('CAAAA…AANFT')
+      expect(truncateAddress(NFT_C, 4, 8)).toBe('CAAA…AAAAANFT')
+    })
+
     it('leaves an address shorter than the elision alone', () => {
       expect(truncateAddress('C123')).toBe('C123')
       expect(truncateAddress('')).toBe('')
+    })
+
+    it('leaves an address exactly as long as the elision alone', () => {
+      const exact = 'ABCDEFGHIJKL' // 12 === 6 + 6
+
+      expect(exact).toHaveLength(12)
+      expect(truncateAddress(exact)).toBe(exact)
+    })
+
+    it('truncates one character past the boundary', () => {
+      // Truncation kicks in here, though the ellipsis means the result is no
+      // shorter than the input. Pinned so the off-by-one stays deliberate.
+      expect(truncateAddress('ABCDEFGHIJKLM')).toBe('ABCDEF…HIJKLM')
+    })
+
+    it('returns an empty string for a nullish address', () => {
+      // Callers pass addresses straight from API payloads, where a missing
+      // field arrives as null rather than ''.
+      expect(truncateAddress(null as unknown as string)).toBe('')
+      expect(truncateAddress(undefined as unknown as string)).toBe('')
     })
   })
 
