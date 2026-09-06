@@ -120,6 +120,7 @@ export default function Wizard({ onDeploySuccess }: WizardProps) {
                   justifyContent: "center",
                   fontSize: "1.125rem"
                 }}
+                aria-label="Remove signer"
                 title="Remove signer"
               >
                 ×

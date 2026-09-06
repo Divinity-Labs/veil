@@ -226,6 +226,7 @@ export default function NFTGalleryPage() {
                 color: 'var(--off-white)',
                 cursor: 'pointer',
               }}
+              aria-label="Refresh NFTs"
               title="Refresh NFTs"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }}>
@@ -606,6 +607,7 @@ export default function NFTGalleryPage() {
                   setSelectedNFT(null)
                   setShowRawJson(false)
                 }}
+                aria-label="Close NFT details"
                 style={{ background: 'var(--surface-md)', border: 'none', color: 'var(--off-white)', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 ✕

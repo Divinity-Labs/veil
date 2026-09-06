@@ -103,6 +103,7 @@ export function InstallBanner() {
         </div>
         <button 
           onClick={handleDismiss} 
+          aria-label="Dismiss install prompt"
           style={{ background: 'none', border: 'none', color: 'var(--warm-grey)', cursor: 'pointer', padding: '4px' }}
         >
           <X size={20} strokeWidth={1.5} />
