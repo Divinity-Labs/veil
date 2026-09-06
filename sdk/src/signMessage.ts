@@ -1,14 +1,32 @@
 import { bufferToHex, hexToUint8Array } from './utils';
 import type { WebAuthnSignature } from './core';
 
+/**
+ * A message signed off-chain by a passkey, in a form that can be stored or sent
+ * and later checked with {@link verifyMessage}.
+ *
+ * Every byte field is hex-encoded so the object survives JSON. It carries no
+ * nonce or expiry, so it stays valid indefinitely.
+ */
 export type SignedMessage = {
+    /** Format version of this envelope. */
     version: 1;
+    /** Domain separator the message was hashed under. */
     domain: 'VEIL_SIGNED_MESSAGE_V1';
+    /** Hex SHA-256 of the domain prefix followed by the message bytes. */
     messageHash: string;
+    /**
+     * Base64url id of the passkey that signed. Informational unless the
+     * verifier passes it as `expectedCredentialId`.
+     */
     credentialId: string;
+    /** Hex P-256 ECDSA signature over `authData || SHA-256(clientDataJSON)`. */
     signature: string;
+    /** Hex uncompressed P-256 public key the signature verifies against. */
     publicKey: string;
+    /** Hex WebAuthn authenticator data from the assertion. */
     authData: string;
+    /** Hex WebAuthn client data JSON, whose challenge binds `messageHash`. */
     clientDataJSON: string;
 };
 
@@ -22,6 +40,22 @@ async function domainSeparatedHash(message: Uint8Array): Promise<Uint8Array> {
     return new Uint8Array(buf);
 }
 
+/**
+ * Sign an arbitrary message with a passkey.
+ *
+ * The message is hashed under the `VEIL_SIGNED_MESSAGE_V1` domain prefix before
+ * signing, so the resulting signature can never be replayed as a Soroban auth
+ * approval: the two hash different preimages. Do not sign a raw message hash
+ * without this separation.
+ *
+ * @param message The bytes to sign.
+ * @param signAuthEntry Prompts the passkey and returns the assertion, or `null`
+ * if the user dismissed it. Typically the wallet's `signAuthEntry` action.
+ * @param credentialId Base64url id of the signing passkey, recorded on the
+ * result.
+ * @returns The signed envelope, verifiable with {@link verifyMessage}.
+ * @throws If `signAuthEntry` resolves to `null`.
+ */
 export async function signMessage(
     message: Uint8Array,
     signAuthEntry: (payload: Uint8Array) => Promise<WebAuthnSignature | null>,

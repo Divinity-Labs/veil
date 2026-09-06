@@ -53,6 +53,13 @@ export interface PrfSecretStore {
  */
 export type PrfEvaluator = (salt: Uint8Array) => Promise<Uint8Array | null>;
 
+/**
+ * How to build a {@link LocalCipher}.
+ *
+ * The cipher prefers a passkey PRF output as its key and falls back to a stored
+ * local key when the authenticator has no PRF, so check {@link LocalCipher.mode}
+ * before treating encrypted data as passkey-bound.
+ */
 export interface PrfCipherConfig {
     /** Base64url credential ID of the passkey to evaluate PRF against. */
     credentialId: string;

@@ -35,6 +35,7 @@ const MAX_STROOPS = 9_223_372_036_854_775_807n;
 /** Largest value for an `id` memo (uint64 max). */
 const MAX_MEMO_ID = 18_446_744_073_709_551_615n;
 
+/** Memo kinds a SEP-7 `pay` request can carry, per the Stellar memo types. */
 export type Sep7MemoType = 'text' | 'id' | 'hash' | 'return';
 
 /** The validated, normalised fields of a SEP-7 `pay` request. */

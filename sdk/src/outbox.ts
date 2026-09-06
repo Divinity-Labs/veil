@@ -37,6 +37,10 @@ import type { StorageAdapter } from './core';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Where a queued transaction stands: waiting to be submitted, accepted by the
+ * network, or rejected.
+ */
 export type OutboxStatus = 'pending' | 'confirmed' | 'failed';
 
 /** A single queued transaction. Serialised as JSON in the storage adapter. */
