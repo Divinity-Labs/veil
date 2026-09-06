@@ -1,5 +1,15 @@
 # invisible-wallet-sdk
 
+## 0.2.1
+
+### Patch Changes
+
+- 84347ec: Add TSDoc to the remaining undocumented public exports, so editor tooltips are
+  populated across the whole SDK surface. Covers `bulkPayout`, `claimableBalance`,
+  `feePayer`, `network`, `signMessage`, `counterfactual`, and the stragglers in
+  `utils`, `outbox`, `sep7`, `crypto/prf`, `recovery/sep30` and
+  `webauthn/attestation`. Comments only; no runtime or type changes.
+
 ## 0.2.0
 
 ### Minor Changes
