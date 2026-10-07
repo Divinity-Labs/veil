@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build",
+    "dev": "node init && next dev -p 3001",
+    "build": "node init && next build",
     "postbuild": "pagefind --site .next/static --output-path public/pagefind || true",
-    "start": "next start"
+    "start": "node init && next start"
   },
   "dependencies": {
     "@theguild/remark-mermaid": "^0.1.3",

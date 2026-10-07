@@ -37,3 +37,4 @@ TODO.md
 frontend/wallet/__sep*probe*.mjs
 frontend/wallet/__sep45probe.mjs
 frontend/wallet/__shot.mjs
+config.bat

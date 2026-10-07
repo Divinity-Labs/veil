@@ -8,6 +8,36 @@
 
 A passkey-powered smart wallet on the Stellar Soroban blockchain. Users authenticate with their device biometrics (Face ID, fingerprint, Windows Hello) instead of seed phrases or private keys.
 
+## Quickstart
+
+Get the Veil wallet running locally in under 5 minutes:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/Divinity-Labs/veil.git && cd veil
+
+# 2. Install workspace dependencies
+npm install
+
+# 3. Configure environment variables for the wallet
+cp .env.example frontend/wallet/.env.local
+
+# 4. Start the wallet development server
+cd frontend/wallet && npm run dev
+```
+
+Open [`http://localhost:3000`](http://localhost:3000) to view the wallet interface in your browser.
+
+### Minimum Required Environment Variables
+
+The wallet runs out-of-the-box on Stellar Testnet using default values in [`.env.example`](.env.example):
+- `NEXT_PUBLIC_NETWORK=testnet` — Network selector (`testnet` or `mainnet`).
+- `NEXT_PUBLIC_HORIZON_URL=https://horizon-testnet.stellar.org` — Stellar Horizon RPC endpoint.
+- `NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org` — Soroban RPC endpoint for contract queries and simulation.
+- `NEXT_PUBLIC_FACTORY_CONTRACT_ID=CAUK4MWO3TTFM6PLURSH2GPK3AB747SZGABKTCVLKCU7W2MGKHKP35GA` — Testnet factory contract ID.
+
+For contributor guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md). For project roadmap and future milestones, see [ROADMAP.md](ROADMAP.md).
+
 ## Live on Stellar mainnet
 
 Veil's contracts are deployed and transacting on Stellar **mainnet**, not only testnet.
